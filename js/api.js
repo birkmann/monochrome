@@ -1960,7 +1960,7 @@ export class LosslessAPI {
         }
 
         const formattedId = String(id).replace(/-/g, '/');
-        return `https://resources.tidal.com/images/${formattedId}/${size}x${size}.jpg`;
+        return `${window.__TIDAL_IMAGE_BASE_URL__ || 'https://resources.tidal.com'}/images/${formattedId}/${size}x${size}.jpg`;
     }
 
     getCoverSrcset(id) {
@@ -1972,7 +1972,7 @@ export class LosslessAPI {
         }
 
         const formattedId = String(id).replace(/-/g, '/');
-        const baseUrl = `https://resources.tidal.com/images/${formattedId}`;
+        const baseUrl = `${window.__TIDAL_IMAGE_BASE_URL__ || 'https://resources.tidal.com'}/images/${formattedId}`;
         return `${baseUrl}/160x160.jpg 160w, ${baseUrl}/320x320.jpg 320w, ${baseUrl}/640x640.jpg 640w`;
     }
 
@@ -1986,7 +1986,7 @@ export class LosslessAPI {
         }
 
         const formattedId = String(id).replace(/-/g, '/');
-        return `https://resources.tidal.com/images/${formattedId}/${size}x${size}.jpg`;
+        return `${window.__TIDAL_IMAGE_BASE_URL__ || 'https://resources.tidal.com'}/images/${formattedId}/${size}x${size}.jpg`;
     }
 
     getArtistPictureSrcset(id) {
@@ -1995,7 +1995,7 @@ export class LosslessAPI {
         }
 
         const formattedId = String(id).replace(/-/g, '/');
-        const baseUrl = `https://resources.tidal.com/images/${formattedId}`;
+        const baseUrl = `${window.__TIDAL_IMAGE_BASE_URL__ || 'https://resources.tidal.com'}/images/${formattedId}`;
         return `${baseUrl}/160x160.jpg 160w, ${baseUrl}/320x320.jpg 320w, ${baseUrl}/640x640.jpg 640w`;
     }
 
@@ -2012,7 +2012,7 @@ export class LosslessAPI {
         }
 
         const formattedId = String(imageId).replace(/-/g, '/');
-        return `https://resources.tidal.com/images/${formattedId}/${size}x720.jpg`;
+        return `${window.__TIDAL_IMAGE_BASE_URL__ || 'https://resources.tidal.com'}/images/${formattedId}/${size}x720.jpg`;
     }
 
     async clearCache() {

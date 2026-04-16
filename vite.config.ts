@@ -59,6 +59,23 @@ export default defineConfig((_options) => {
                 // host: true,
                 // allowedHosts: ['<your_tailscale_hostname>'], // e.g. pi5.tailf5f622.ts.net
             },
+            proxy: {
+                '/_proxy/appwrite': {
+                    target: 'https://auth.samidy.com',
+                    changeOrigin: true,
+                    rewrite: (p) => p.replace(/^\/_proxy\/appwrite/, ''),
+                },
+                '/_proxy/contributors': {
+                    target: 'https://api.samidy.com',
+                    changeOrigin: true,
+                    rewrite: (p) => p.replace(/^\/_proxy\/contributors/, ''),
+                },
+                '/_proxy/tidal-images': {
+                    target: 'https://resources.tidal.com',
+                    changeOrigin: true,
+                    rewrite: (p) => p.replace(/^\/_proxy\/tidal-images/, ''),
+                },
+            },
         },
         // preview: {
         //     host: true,

@@ -23,6 +23,8 @@ function buildInjectionScript(env) {
     const APPWRITE_ENDPOINT = env.APPWRITE_ENDPOINT;
     const APPWRITE_PROJECT_ID = env.APPWRITE_PROJECT_ID;
     const POCKETBASE_URL = env.POCKETBASE_URL;
+    const CONTRIBUTORS_URL = env.CONTRIBUTORS_URL;
+    const TIDAL_IMAGE_BASE_URL = env.TIDAL_IMAGE_BASE_URL;
     const AUTH_GOOGLE_ENABLED = env.AUTH_GOOGLE_ENABLED;
     const AUTH_EMAIL_ENABLED = env.AUTH_EMAIL_ENABLED;
 
@@ -41,6 +43,8 @@ function buildInjectionScript(env) {
     if (APPWRITE_ENDPOINT) flags.push(`window.__APPWRITE_ENDPOINT__=${JSON.stringify(APPWRITE_ENDPOINT)}`);
     if (APPWRITE_PROJECT_ID) flags.push(`window.__APPWRITE_PROJECT_ID__=${JSON.stringify(APPWRITE_PROJECT_ID)}`);
     if (POCKETBASE_URL) flags.push(`window.__POCKETBASE_URL__=${JSON.stringify(POCKETBASE_URL)}`);
+    if (CONTRIBUTORS_URL) flags.push(`window.__CONTRIBUTORS_URL__=${JSON.stringify(CONTRIBUTORS_URL)}`);
+    if (TIDAL_IMAGE_BASE_URL) flags.push(`window.__TIDAL_IMAGE_BASE_URL__=${JSON.stringify(TIDAL_IMAGE_BASE_URL)}`);
 
     return flags.length > 0 ? `<script>${flags.join(';')};</script>` : null;
 }
