@@ -9,6 +9,7 @@ import svgUse from './vite-plugin-svg-use.js';
 import purgecss from 'vite-plugin-purgecss';
 import { execSync } from 'child_process';
 import { playwright } from '@vitest/browser-playwright';
+import { devProxyMap } from './dev-proxy.manifest.js';
 
 function getGitCommitHash() {
     try {
@@ -59,23 +60,20 @@ export default defineConfig((_options) => {
                 // host: true,
                 // allowedHosts: ['<your_tailscale_hostname>'], // e.g. pi5.tailf5f622.ts.net
             },
-            proxy: {
-                '/_proxy/appwrite': {
-                    target: 'https://auth.samidy.com',
-                    changeOrigin: true,
-                    rewrite: (p) => p.replace(/^\/_proxy\/appwrite/, ''),
-                },
-                '/_proxy/contributors': {
-                    target: 'https://api.samidy.com',
-                    changeOrigin: true,
-                    rewrite: (p) => p.replace(/^\/_proxy\/contributors/, ''),
-                },
-                '/_proxy/tidal-images': {
-                    target: 'https://resources.tidal.com',
-                    changeOrigin: true,
-                    rewrite: (p) => p.replace(/^\/_proxy\/tidal-images/, ''),
-                },
-            },
+            proxy: Object.fromEntries(
+                Object.entries(devProxyMap).map(([prefix, target]) => [
+                    prefix,
+                    {
+                        target,
+                        changeOrigin: true,
+                        rewrite: (p: string) =>
+                            p.replace(
+                                new RegExp(`^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`),
+                                ''
+                            ),
+                    },
+                ])
+            ),
         },
         // preview: {
         //     host: true,

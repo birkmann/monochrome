@@ -4,10 +4,7 @@ const getEndpoint = () => {
     const local = localStorage.getItem('monochrome-appwrite-endpoint');
     if (local) return local;
 
-    if (window.__APPWRITE_ENDPOINT__) {
-        const ep = window.__APPWRITE_ENDPOINT__;
-        return ep.startsWith('/') ? `${window.location.origin}${ep}` : ep;
-    }
+    if (window.__APPWRITE_ENDPOINT__) return window.__APPWRITE_ENDPOINT__;
 
     const hostname = window.location.hostname;
     if (hostname.endsWith('monochrome.tf') || hostname === 'monochrome.tf') {

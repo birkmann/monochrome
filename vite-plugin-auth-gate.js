@@ -2,6 +2,32 @@ import { loadEnv } from 'vite';
 import cookieSession from 'cookie-session';
 import { readFileSync, existsSync } from 'fs';
 import { join, extname } from 'path';
+import { devProxyMap } from './dev-proxy.manifest.js';
+
+function devProxyFetchPatchSource() {
+    return `(function(){
+        var m = window.__DEV_PROXY_MAP__;
+        if (!m) return;
+        var origin = window.location.origin;
+        function rw(u) {
+            if (typeof u !== 'string') return u;
+            for (var p in m) {
+                var t = m[p];
+                if (u.indexOf(t) === 0) return origin + p + u.slice(t.length);
+            }
+            return u;
+        }
+        var nf = window.fetch.bind(window);
+        window.fetch = function(input, init) {
+            if (typeof input === 'string') return nf(rw(input), init);
+            if (typeof Request !== 'undefined' && input instanceof Request) {
+                var nu = rw(input.url);
+                if (nu !== input.url) return nf(new Request(nu, input), init);
+            }
+            return nf(input, init);
+        };
+    })()`;
+}
 
 function parseBody(req) {
     return new Promise((resolve, reject) => {
@@ -18,13 +44,11 @@ function parseBody(req) {
     });
 }
 
-function buildInjectionScript(env) {
+function buildInjectionScript(env, { isDev = false } = {}) {
     const AUTH_ENABLED = (env.AUTH_ENABLED ?? 'false') !== 'false';
     const APPWRITE_ENDPOINT = env.APPWRITE_ENDPOINT;
     const APPWRITE_PROJECT_ID = env.APPWRITE_PROJECT_ID;
     const POCKETBASE_URL = env.POCKETBASE_URL;
-    const CONTRIBUTORS_URL = env.CONTRIBUTORS_URL;
-    const TIDAL_IMAGE_BASE_URL = env.TIDAL_IMAGE_BASE_URL;
     const AUTH_GOOGLE_ENABLED = env.AUTH_GOOGLE_ENABLED;
     const AUTH_EMAIL_ENABLED = env.AUTH_EMAIL_ENABLED;
 
@@ -43,29 +67,34 @@ function buildInjectionScript(env) {
     if (APPWRITE_ENDPOINT) flags.push(`window.__APPWRITE_ENDPOINT__=${JSON.stringify(APPWRITE_ENDPOINT)}`);
     if (APPWRITE_PROJECT_ID) flags.push(`window.__APPWRITE_PROJECT_ID__=${JSON.stringify(APPWRITE_PROJECT_ID)}`);
     if (POCKETBASE_URL) flags.push(`window.__POCKETBASE_URL__=${JSON.stringify(POCKETBASE_URL)}`);
-    if (CONTRIBUTORS_URL) flags.push(`window.__CONTRIBUTORS_URL__=${JSON.stringify(CONTRIBUTORS_URL)}`);
-    if (TIDAL_IMAGE_BASE_URL) flags.push(`window.__TIDAL_IMAGE_BASE_URL__=${JSON.stringify(TIDAL_IMAGE_BASE_URL)}`);
+
+    if (isDev && Object.keys(devProxyMap).length > 0) {
+        flags.push(`window.__DEV_PROXY_MAP__=${JSON.stringify(devProxyMap)}`);
+        flags.push(devProxyFetchPatchSource());
+    }
 
     return flags.length > 0 ? `<script>${flags.join(';')};</script>` : null;
 }
 
 export default function authGatePlugin() {
     let env = {};
+    let isDev = false;
 
     return {
         name: 'auth-gate',
 
         config(_, { mode }) {
             env = loadEnv(mode, process.cwd(), '');
+            isDev = mode === 'development';
         },
 
         transformIndexHtml(html) {
-            const scriptTag = buildInjectionScript(env);
+            const scriptTag = buildInjectionScript(env, { isDev });
             return scriptTag ? html.replace('</head>', `${scriptTag}\n</head>`) : html;
         },
 
         configurePreviewServer(server) {
-            const configScript = buildInjectionScript(env);
+            const configScript = buildInjectionScript(env, { isDev: false });
 
             // --- Pre-build injected HTML pages ---
 
