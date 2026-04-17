@@ -5267,7 +5267,7 @@ input:checked + .slider::before {
 
 #download-notifications {
     position: fixed;
-    bottom: calc(max(env(safe-area-inset-bottom), 0px) + 12px);
+    top: calc(max(env(safe-area-inset-top), 0px) + 12px);
     right: 20px;
     z-index: 20000;
     max-width: 350px;
@@ -7095,7 +7095,7 @@ img[src=''] {
     }
 
     #download-notifications {
-        bottom: calc(max(env(safe-area-inset-bottom), 0px) + 10px);
+        top: calc(max(env(safe-area-inset-top), 0px) + 10px);
         right: 10px;
         left: 10px;
         max-width: none;
